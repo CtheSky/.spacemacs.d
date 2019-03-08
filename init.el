@@ -57,6 +57,7 @@ values."
              shell-default-position 'bottom)
      ;; spell-checking
      ;; version-control
+     osx-dictionary
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -360,20 +361,20 @@ you should place your code here."
   (pyvenv-tracking-mode)
 
   ;; osx dictionary
-  (use-package osx-dictionary
-    :if (eq system-type 'darwin)
-    :ensure t
-    :config
-    (defun osx-dict-in-other-window ()
-      (interactive)
-      (osx-dictionary-search-word-at-point)
-      (other-window -1))
-    (evil-define-key 'normal osx-dictionary-mode-map
-      "q" 'osx-dictionary-quit
-      "s" 'osx-dictionary-search-input
-      "o" 'osx-dictionary-open-dictionary.app
-      "r" 'osx-dictionary-read-word)
-    (spacemacs/set-leader-keys "dc" 'osx-dict-in-other-window))
+  ;; (use-package osx-dictionary
+  ;;   :if (eq system-type 'darwin)
+  ;;   :ensure t
+  ;;   :config
+  ;;   (defun osx-dict-in-other-window ()
+  ;;     (interactive)
+  ;;     (osx-dictionary-search-word-at-point)
+  ;;     (other-window -1))
+  ;;   (evil-define-key 'normal osx-dictionary-mode-map
+  ;;     "q" 'osx-dictionary-quit
+  ;;     "s" 'osx-dictionary-search-input
+  ;;     "o" 'osx-dictionary-open-dictionary.app
+  ;;     "r" 'osx-dictionary-read-word)
+  ;;   (spacemacs/set-leader-keys "dc" 'osx-dict-in-other-window))
 
   (global-company-mode)
   (global-flycheck-mode))
