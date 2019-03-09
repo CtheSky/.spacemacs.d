@@ -361,21 +361,8 @@ you should place your code here."
     "gb" 'xref-pop-marker-stack)
   (pyvenv-tracking-mode)
 
-  ;; osx dictionary
-  ;; (use-package osx-dictionary
-  ;;   :if (eq system-type 'darwin)
-  ;;   :ensure t
-  ;;   :config
-  ;;   (defun osx-dict-in-other-window ()
-  ;;     (interactive)
-  ;;     (osx-dictionary-search-word-at-point)
-  ;;     (other-window -1))
-  ;;   (evil-define-key 'normal osx-dictionary-mode-map
-  ;;     "q" 'osx-dictionary-quit
-  ;;     "s" 'osx-dictionary-search-input
-  ;;     "o" 'osx-dictionary-open-dictionary.app
-  ;;     "r" 'osx-dictionary-read-word)
-  ;;   (spacemacs/set-leader-keys "dc" 'osx-dict-in-other-window))
+  ;; magit
+  (add-hook 'git-commit-mode-hook 'evil-insert-state)
 
   (global-company-mode)
   (global-flycheck-mode))
