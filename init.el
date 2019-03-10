@@ -378,6 +378,14 @@ you should place your code here."
   (global-company-mode)
   (global-flycheck-mode)
 
+  ;; projectile
+  (spacemacs/set-leader-keys
+    "psi" 'projectile-run-ielm
+    "pss" 'projectile-run-shell
+    "pst" 'projectile-run-term
+    "pse" 'projectile-run-eshell
+    "psm" 'projectile-multi-term-in-root)
+
   ;; fix C-k not working in company : https://github.com/syl20bnr/spacemacs/issues/2974
   (add-hook
    'company-completion-started-hook
