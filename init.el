@@ -319,6 +319,17 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
+  ;; modify evil insert mode
+  (bind-keys :map evil-insert-state-map
+             ("C-a" . move-beginning-of-line)
+             ("C-e" . move-end-of-line)
+             ("C-f" . forward-char)
+             ("C-b" . backward-char)
+             ("C-d" . delete-char)
+             ("C-w" . backward-kill-word)
+             ("C-p" . previous-line)
+             ("C-n" . next-line))
+
   ;; org
   (with-eval-after-load 'org
     (push "~/org/agenda" org-agenda-files))
@@ -365,7 +376,17 @@ you should place your code here."
   (add-hook 'git-commit-mode-hook 'evil-insert-state)
 
   (global-company-mode)
-  (global-flycheck-mode))
+  (global-flycheck-mode)
+
+  ;; fix C-k not working in company : https://github.com/syl20bnr/spacemacs/issues/2974
+  (add-hook
+   'company-completion-started-hook
+   (lambda (&rest ignore)
+     (when evil-mode
+       (when (evil-insert-state-p)
+         (define-key evil-insert-state-map (kbd "C-k") nil)))))
+)
+
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
