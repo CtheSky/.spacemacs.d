@@ -143,9 +143,12 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 13
+   dotspacemacs-default-font '("Menlo"
+                               :size 12
+                               :height 14
                                :weight normal
+                               :ascent 11
+                               :descent 3
                                :width normal
                                :powerline-scale 1.1)
    ;; The leader key
@@ -361,6 +364,9 @@ you should place your code here."
   ;; disable backup file & auto save
   (setq make-backup-files nil)
   (setq auto-save-default nil)
+
+  ;; leader key for workspace control
+  (spacemacs/set-leader-keys ";" 'spacemacs/workspaces-transient-state/body)
 
   ;; shell
   (evil-define-key 'insert shell-mode-map (kbd "C-r") 'spacemacs/helm-shell-history)
