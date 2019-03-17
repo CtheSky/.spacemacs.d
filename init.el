@@ -344,7 +344,6 @@ you should place your code here."
   (setq powerline-default-separator 'utf-8)
   (which-function-mode t)
   (spaceline-toggle-which-function-on)
-  (spaceline-toggle-projectile-root-on)
   (spaceline-toggle-minor-modes-off)
 
   ;; set startup frame size & position
