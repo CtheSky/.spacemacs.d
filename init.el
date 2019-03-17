@@ -395,7 +395,9 @@ you should place your code here."
     (kbd "C-r") '(lambda () (interactive) (term-send-raw-string "\C-r"))
     (kbd "C-n") '(lambda () (interactive) (term-send-raw-string "\C-n"))
     (kbd "C-p") '(lambda () (interactive) (term-send-raw-string "\C-p"))
-    (kbd "C-k") '(lambda () (interactive) (term-send-raw-string "\C-k")))
+    (kbd "C-k") '(lambda () (interactive) (term-send-raw-string "\C-k"))
+    (kbd "C-v") '(lambda () (interactive) (term-paste))
+    (kbd "s-v") '(lambda () (interactive) (term-paste)))
 
   ;; python
   (spacemacs/set-leader-keys-for-major-mode 'python-mode
