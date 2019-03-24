@@ -32,6 +32,7 @@ values."
    dotspacemacs-configuration-layers
    '(
      nginx
+     lua
      rust
      javascript
      yaml
@@ -66,7 +67,8 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages
+   '((vterm :location "~/.emacs.d/private/local/emacs-libvterm/"))
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -396,11 +398,30 @@ you should place your code here."
     (kbd "C-p") '(lambda () (interactive) (term-send-raw-string "\C-p"))
     (kbd "C-k") '(lambda () (interactive) (term-send-raw-string "\C-k"))
     (kbd "C-v") '(lambda () (interactive) (term-paste))
-    (kbd "s-v") '(lambda () (interactive) (term-paste)))
+    (kbd "s-v") '(lambda () (interactive) (term-paste))
+    (kbd "C-]") '(lambda () (interactive) (term-send-raw-string "\C-[")))
+
+  (add-hook 'term-mode-hook 'ansi-term-handle-close)
+  (add-hook 'term-mode-hook (lambda () (setq bidi-paragraph-direction 'left-to-right)))
+
+  ;; vterm
+  (require 'vterm)
+  (evil-define-key 'insert vterm-mode-map
+    (kbd "C-a") '(lambda () (interactive) (vterm-send-string "\C-a"))
+    (kbd "C-e") '(lambda () (interactive) (vterm-send-string "\C-e"))
+    (kbd "C-f") '(lambda () (interactive) (vterm-send-string "\C-f"))
+    (kbd "C-b") '(lambda () (interactive) (vterm-send-string "\C-b"))
+    (kbd "C-d") '(lambda () (interactive) (vterm-send-string "\C-d"))
+    (kbd "C-w") '(lambda () (interactive) (vterm-send-string "\C-w"))
+    (kbd "C-r") '(lambda () (interactive) (vterm-send-string "\C-r"))
+    (kbd "C-n") '(lambda () (interactive) (vterm-send-string "\C-n"))
+    (kbd "C-p") '(lambda () (interactive) (vterm-send-string "\C-p"))
+    (kbd "C-k") '(lambda () (interactive) (vterm-send-string "\C-k"))
+    (kbd "C-v") '(lambda () (interactive) (vterm-yank))
+    (kbd "s-v") '(lambda () (interactive) (vterm-yank))
+    (kbd "C-]") '(lambda () (interactive) (vterm-send-string "\C-[")))
 
   ;; python
-  (spacemacs/set-leader-keys-for-major-mode 'python-mode
-    "gb" 'xref-pop-marker-stack)
   (pyvenv-tracking-mode)
 
   ;; magit
@@ -436,7 +457,7 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (eterm-256color nginx-mode org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot ibuffer-projectile osx-dictionary engine-mode toml-mode racer flycheck-rust cargo markdown-mode rust-mode helm-dash dash-at-point git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl company-quickhelp flycheck-pos-tip pos-tip flycheck web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode yaml-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help ac-ispell helm-company helm-c-yasnippet fuzzy company-statistics company-anaconda company auto-yasnippet yasnippet auto-complete evil-magit smeargle orgit magit-gitflow magit-popup magit transient helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-commit with-editor lv yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+    (vterm lua-mode eterm-256color nginx-mode org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot ibuffer-projectile osx-dictionary engine-mode toml-mode racer flycheck-rust cargo markdown-mode rust-mode helm-dash dash-at-point git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl company-quickhelp flycheck-pos-tip pos-tip flycheck web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode yaml-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help ac-ispell helm-company helm-c-yasnippet fuzzy company-statistics company-anaconda company auto-yasnippet yasnippet auto-complete evil-magit smeargle orgit magit-gitflow magit-popup magit transient helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-commit with-editor lv yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
  '(safe-local-variable-values (quote ((pyvenv-workon . "ats3")))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
