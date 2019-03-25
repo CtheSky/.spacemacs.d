@@ -68,7 +68,9 @@ values."
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
-   '((vterm :location "~/.emacs.d/private/local/emacs-libvterm/"))
+   '(
+     ;; (vterm :location "~/.emacs.d/private/local/emacs-libvterm/")
+     )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -405,21 +407,21 @@ you should place your code here."
   (add-hook 'term-mode-hook (lambda () (setq bidi-paragraph-direction 'left-to-right)))
 
   ;; vterm
-  (require 'vterm)
-  (evil-define-key 'insert vterm-mode-map
-    (kbd "C-a") '(lambda () (interactive) (vterm-send-string "\C-a"))
-    (kbd "C-e") '(lambda () (interactive) (vterm-send-string "\C-e"))
-    (kbd "C-f") '(lambda () (interactive) (vterm-send-string "\C-f"))
-    (kbd "C-b") '(lambda () (interactive) (vterm-send-string "\C-b"))
-    (kbd "C-d") '(lambda () (interactive) (vterm-send-string "\C-d"))
-    (kbd "C-w") '(lambda () (interactive) (vterm-send-string "\C-w"))
-    (kbd "C-r") '(lambda () (interactive) (vterm-send-string "\C-r"))
-    (kbd "C-n") '(lambda () (interactive) (vterm-send-string "\C-n"))
-    (kbd "C-p") '(lambda () (interactive) (vterm-send-string "\C-p"))
-    (kbd "C-k") '(lambda () (interactive) (vterm-send-string "\C-k"))
-    (kbd "C-v") '(lambda () (interactive) (vterm-yank))
-    (kbd "s-v") '(lambda () (interactive) (vterm-yank))
-    (kbd "C-]") '(lambda () (interactive) (vterm-send-string "\C-[")))
+  ;; (require 'vterm)
+  ;; (evil-define-key 'insert vterm-mode-map
+  ;;   (kbd "C-a") '(lambda () (interactive) (vterm-send-string "\C-a"))
+  ;;   (kbd "C-e") '(lambda () (interactive) (vterm-send-string "\C-e"))
+  ;;   (kbd "C-f") '(lambda () (interactive) (vterm-send-string "\C-f"))
+  ;;   (kbd "C-b") '(lambda () (interactive) (vterm-send-string "\C-b"))
+  ;;   (kbd "C-d") '(lambda () (interactive) (vterm-send-string "\C-d"))
+  ;;   (kbd "C-w") '(lambda () (interactive) (vterm-send-string "\C-w"))
+  ;;   (kbd "C-r") '(lambda () (interactive) (vterm-send-string "\C-r"))
+  ;;   (kbd "C-n") '(lambda () (interactive) (vterm-send-string "\C-n"))
+  ;;   (kbd "C-p") '(lambda () (interactive) (vterm-send-string "\C-p"))
+  ;;   (kbd "C-k") '(lambda () (interactive) (vterm-send-string "\C-k"))
+  ;;   (kbd "C-v") '(lambda () (interactive) (vterm-yank))
+  ;;   (kbd "s-v") '(lambda () (interactive) (vterm-yank))
+  ;;   (kbd "C-]") '(lambda () (interactive) (vterm-send-string "\C-[")))
 
   ;; python
   (pyvenv-tracking-mode)
