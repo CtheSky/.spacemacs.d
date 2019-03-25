@@ -406,6 +406,12 @@ you should place your code here."
   (add-hook 'term-mode-hook 'ansi-term-handle-close)
   (add-hook 'term-mode-hook (lambda () (setq bidi-paragraph-direction 'left-to-right)))
 
+  (defun term-install-terminfo-of-eterm ()
+    "install terminfo of eterm by curl & tic"
+    (interactive)
+    (term-send-raw-string "curl https://gist.githubusercontent.com/CtheSky/f11cb6e262d34b359d43cab8d91146f4/raw/c27c444bda7f4e74546f5d519fd3d6452e12bc8f/eterm-color.ti > /tmp/eterm-color.ti && tic /tmp/eterm-color.ti && curl https://gist.githubusercontent.com/CtheSky/f11cb6e262d34b359d43cab8d91146f4/raw/c27c444bda7f4e74546f5d519fd3d6452e12bc8f/eterm-256color.ti > /tmp/eterm-256color.ti && tic /tmp/eterm-256color.ti\n")
+    )
+
   ;; vterm
   ;; (require 'vterm)
   ;; (evil-define-key 'insert vterm-mode-map
