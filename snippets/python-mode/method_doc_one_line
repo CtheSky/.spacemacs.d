@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: method_doc_one_line
+# key: md
+# group: object oriented
+# --
+def ${1:method}(self${2:, $3}):
+    """$4"""
+    $0
