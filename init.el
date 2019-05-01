@@ -31,6 +31,7 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     docker
      nginx
      lua
      rust
@@ -39,13 +40,17 @@ values."
      search-engine
      (ibuffer :variables ibuffer-group-buffers-by 'projects)
      (python :variables python-test-runner 'pytest)
+     cmake
+     (c-c++ :variables
+            c-c++-enable-clang-support t
+            c-c++-backend 'rtags)
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      helm
-     syntax-checking
+     (syntax-checking :variables syntax-checking-enable-tooltips nil)
      (auto-completion :variables
                       auto-completion-enable-help-tooltip t)
      ;; better-defaults
@@ -54,7 +59,7 @@ values."
      dash
      (dash :variables helm-dash-browser-func 'eww)
      ;; markdown
-     org
+     (org :variables org-want-todo-bindings t)
      (shell :variables
              shell-default-height 30
              shell-default-position 'bottom)
@@ -62,6 +67,7 @@ values."
      ;; spell-checking
      ;; version-control
      osx-dictionary
+     neotree
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -318,7 +324,7 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
-  (setenv "WORKON_HOME" "~/miniconda3/envs"))
+  )
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
@@ -327,6 +333,26 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+
+  ;; Bind "Emacs Mac port" keys the same as Emacs NS/Cocoa
+  (cua-mode t)
+  (when (symbolp 'mac-control-modifier)
+    (setq mac-control-modifier 'control
+          mac-option-modifier 'meta
+          mac-command-modifier 'super)
+    (global-set-key (kbd "s-s") 'save-buffer)
+    (global-set-key (kbd "s-z") 'undo)
+    (global-set-key (kbd "s-x") 'cua-cut-region)
+    (global-set-key (kbd "s-c") 'cua-copy-region)
+    (global-set-key (kbd "s-v") 'cua-paste)
+    (global-set-key (kbd "s-w") 'delete-frame)
+    (global-set-key (kbd "s-q") 'save-buffers-kill-emacs)
+    (global-set-key (kbd "s-k") 'kill-this-buffer)
+    (global-set-key (kbd "s-u") 'revert-buffer)
+    (global-set-key (kbd "s-a") 'mark-whole-buffer)
+    (global-set-key (kbd "s-l") 'goto-line)
+    (global-set-key (kbd "s-'") 'switch-window)
+    )
 
   ;; modify evil insert mode
   (bind-keys :map evil-insert-state-map
@@ -349,6 +375,7 @@ you should place your code here."
   (which-function-mode t)
   (spaceline-toggle-which-function-on)
   (spaceline-toggle-minor-modes-off)
+  (spaceline-toggle-hud-off)
 
   ;; set startup frame size & position
   (if (display-graphic-p)
@@ -356,6 +383,9 @@ you should place your code here."
 	          '((top . 0) (left . 760)
               (width . 150) (height . 54)
               )))
+
+  ;; disable default snippets
+  ;; (setq-default yas-snippet-dirs '("~/.spacemacs.d/snippets"))
 
   ;; y or n
   (fset 'yes-or-no-p 'y-or-n-p)
@@ -370,22 +400,6 @@ you should place your code here."
 
   ;; leader key for workspace control
   (spacemacs/set-leader-keys ";" 'spacemacs/workspaces-transient-state/body)
-
-  ;; shell
-  (evil-define-key 'insert shell-mode-map (kbd "C-r") 'spacemacs/helm-shell-history)
-  (defun my/shell-mode-hook ()
-    (setq comint-input-ring-file-name "~/.zsh_history")
-    (setq comint-input-ring-separator "\n: \\([0-9]+\\):\\([0-9]+\\);")
-    (comint-read-input-ring t))
-  (add-hook 'shell-mode-hook 'my/shell-mode-hook)
-  (evil-define-key 'insert shell-mode-map
-    (kbd "C-a") 'move-beginning-of-line
-    (kbd "C-e") 'move-end-of-line
-    (kbd "C-f") 'forward-char
-    (kbd "C-b") 'backward-char
-    (kbd "C-d") 'delete-char
-    (kbd "C-w") 'backward-kill-word
-    (kbd "C-k") 'kill-line)
 
   ;; term
   (evil-define-key 'insert term-raw-map
@@ -406,13 +420,49 @@ you should place your code here."
   (add-hook 'term-mode-hook 'ansi-term-handle-close)
   (add-hook 'term-mode-hook (lambda () (setq bidi-paragraph-direction 'left-to-right)))
 
-  (defun term-install-terminfo-of-eterm ()
-    "install terminfo of eterm by curl & tic"
-    (interactive)
-    (term-send-raw-string "curl https://gist.githubusercontent.com/CtheSky/f11cb6e262d34b359d43cab8d91146f4/raw/c27c444bda7f4e74546f5d519fd3d6452e12bc8f/eterm-color.ti > /tmp/eterm-color.ti && tic /tmp/eterm-color.ti && curl https://gist.githubusercontent.com/CtheSky/f11cb6e262d34b359d43cab8d91146f4/raw/c27c444bda7f4e74546f5d519fd3d6452e12bc8f/eterm-256color.ti > /tmp/eterm-256color.ti && tic /tmp/eterm-256color.ti\n")
-    )
+  ;; https://github.com/syl20bnr/spacemacs/issues/10779
+  (setq term-char-mode-point-at-process-mark nil)
 
-  ;; vterm
+  (defun cth/found-latest-term-buffer ()
+    "Found latest live term buffer, returns buffer or nil if not found"
+    (let ((term-buffer-found nil)
+          (buffers-to-search (buffer-list)))
+      (while (and (not term-buffer-found) buffers-to-search)
+        (let ((buffer (car buffers-to-search))
+              (rest-buffers (cdr buffers-to-search)))
+          (if (and (buffer-live-p buffer)
+                   (eq 'term-mode (with-current-buffer buffer major-mode))
+                   (get-buffer-process buffer))
+              (setq term-buffer-found buffer))
+          (setq buffers-to-search rest-buffers)))
+      term-buffer-found))
+
+  (defun cth/send-current-line-to-term ()
+    "Send current line at point to latest active term buffer, do nothing if no buffer found"
+    (interactive)
+    (let ((buffer (cth/found-latest-term-buffer))
+          (content (string-trim-left (thing-at-point 'line t))))
+      (if buffer
+          (with-current-buffer buffer (term-send-raw-string content))
+        (message "No active term buffer found"))))
+
+  (defun cth/send-active-region-to-term ()
+    "Send active region to latest active term buffer, do nothing if no buffer or active region found"
+    (interactive)
+    (if (use-region-p)
+        (let ((buffer (cth/found-latest-term-buffer))
+               (content (buffer-substring (region-beginning) (region-end))))
+           (if buffer
+               (progn
+                 (with-current-buffer buffer (term-send-raw-string content))
+                 (deactivate-mark))
+             (message "No active term buffer found"))))
+      (message "No active region found"))
+
+  (spacemacs/set-leader-keys "it" 'cth/send-current-line-to-term)
+  (define-key evil-visual-state-map (kbd "t") 'cth/send-active-region-to-term)
+
+ ;; vterm
   ;; (require 'vterm)
   ;; (evil-define-key 'insert vterm-mode-map
   ;;   (kbd "C-a") '(lambda () (interactive) (vterm-send-string "\C-a"))
@@ -437,6 +487,9 @@ you should place your code here."
 
   (global-company-mode)
   (global-flycheck-mode)
+
+  ;; search engine
+  (spacemacs/set-leader-keys "ag" 'engine/search-google)
 
   ;; projectile
   (spacemacs/set-leader-keys
@@ -465,7 +518,7 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (vterm lua-mode eterm-256color nginx-mode org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot ibuffer-projectile osx-dictionary engine-mode toml-mode racer flycheck-rust cargo markdown-mode rust-mode helm-dash dash-at-point git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl company-quickhelp flycheck-pos-tip pos-tip flycheck web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode yaml-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help ac-ispell helm-company helm-c-yasnippet fuzzy company-statistics company-anaconda company auto-yasnippet yasnippet auto-complete evil-magit smeargle orgit magit-gitflow magit-popup magit transient helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-commit with-editor lv yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+    (disaster company-c-headers cmake-mode clang-format vterm lua-mode eterm-256color nginx-mode org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot ibuffer-projectile osx-dictionary engine-mode toml-mode racer flycheck-rust cargo markdown-mode rust-mode helm-dash dash-at-point git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl company-quickhelp flycheck-pos-tip pos-tip flycheck web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode yaml-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help ac-ispell helm-company helm-c-yasnippet fuzzy company-statistics company-anaconda company auto-yasnippet yasnippet auto-complete evil-magit smeargle orgit magit-gitflow magit-popup magit transient helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-commit with-editor lv yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
  '(safe-local-variable-values (quote ((pyvenv-workon . "ats3")))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -473,3 +526,24 @@ you should place your code here."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (phpunit phpcbf php-extras php-auto-yasnippets helm-gtags ggtags drupal-mode counsel-gtags company-php ac-php-core php-mode disaster company-c-headers cmake-mode clang-format vterm lua-mode eterm-256color nginx-mode org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot ibuffer-projectile osx-dictionary engine-mode toml-mode racer flycheck-rust cargo markdown-mode rust-mode helm-dash dash-at-point git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl company-quickhelp flycheck-pos-tip pos-tip flycheck web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode yaml-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help ac-ispell helm-company helm-c-yasnippet fuzzy company-statistics company-anaconda company auto-yasnippet yasnippet auto-complete evil-magit smeargle orgit magit-gitflow magit-popup magit transient helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-commit with-editor lv yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+ '(safe-local-variable-values (quote ((pyvenv-workon . "ats3")))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+)
