@@ -88,7 +88,7 @@ values."
    ;; `used-but-keep-unused' installs only the used packages but won't uninstall
    ;; them if they become unused. `all' installs *all* packages supported by
    ;; Spacemacs and never uninstall them. (default is `used-only')
-   dotspacemacs-install-packages 'used-only))
+   dotspacemacs-install-packages 'used-but-keep-unsed))
 
 (defun dotspacemacs/init ()
   "Initialization function.
@@ -353,6 +353,21 @@ you should place your code here."
     (global-set-key (kbd "s-l") 'goto-line)
     (global-set-key (kbd "s-'") 'switch-window)
     )
+
+  ;; copy & paste with osx clipboard, defualt for gui but not defualt in terminal
+  ;; https://emacs.stackexchange.com/questions/10900/copy-text-from-emacs-to-os-x-clipboard
+  (when (eq system-type 'darwin)
+    (defun copy-from-osx ()
+      (shell-command-to-string "pbpaste"))
+
+    (defun paste-to-osx (text &optional push)
+      (let ((process-connection-type nil))
+        (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+          (process-send-string proc text)
+          (process-send-eof proc))))
+
+    (setq interprogram-cut-function 'paste-to-osx)
+    (setq interprogram-paste-function 'copy-from-osx))
 
   ;; modify evil insert mode
   (bind-keys :map evil-insert-state-map
