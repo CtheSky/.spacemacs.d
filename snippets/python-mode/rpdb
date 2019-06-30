@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: rpdb trace
+# key: rp
+# group: debug
+# --
+from pudb.remote import set_trace;set_trace(term_size=(80, 24))
