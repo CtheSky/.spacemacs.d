@@ -334,6 +334,19 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
+  ;; fix low color contrast in terminal daemon
+  ;; https://github.com/syl20bnr/spacemacs/issues/10916
+  (set-face-attribute 'spacemacs-normal-face nil :foreground "#262626")
+  (set-face-attribute 'spacemacs-hybrid-face nil :foreground "#262626")
+  (set-face-attribute 'spacemacs-emacs-face nil :foreground "#262626")
+  (set-face-attribute 'spacemacs-evilified-face nil :foreground "#262626")
+  (set-face-attribute 'spacemacs-visual-face nil :foreground "#262626")
+  (set-face-attribute 'spacemacs-replace-face nil :foreground "#262626")
+  (set-face-attribute 'spacemacs-insert-face nil :foreground "#262626")
+  (set-face-attribute 'spacemacs-motion-face nil :foreground "#262626")
+  (set-face-attribute 'spacemacs-iedit-face nil :foreground "#262626")
+  (set-face-attribute 'spacemacs-iedit-insert-face nil :foreground "#262626")
+
   ;; Bind "Emacs Mac port" keys the same as Emacs NS/Cocoa
   (cua-mode t)
   (when (symbolp 'mac-control-modifier)
@@ -359,13 +372,11 @@ you should place your code here."
   (when (eq system-type 'darwin)
     (defun copy-from-osx ()
       (shell-command-to-string "pbpaste"))
-
     (defun paste-to-osx (text &optional push)
       (let ((process-connection-type nil))
         (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
           (process-send-string proc text)
           (process-send-eof proc))))
-
     (setq interprogram-cut-function 'paste-to-osx)
     (setq interprogram-paste-function 'copy-from-osx))
 
