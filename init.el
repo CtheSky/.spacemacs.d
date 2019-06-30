@@ -75,6 +75,7 @@ values."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
    '(
+     xclip
      ;; (vterm :location "~/.emacs.d/private/local/emacs-libvterm/")
      )
    ;; A list of packages that cannot be updated.
@@ -368,17 +369,8 @@ you should place your code here."
     )
 
   ;; copy & paste with osx clipboard, defualt for gui but not defualt in terminal
-  ;; https://emacs.stackexchange.com/questions/10900/copy-text-from-emacs-to-os-x-clipboard
-  (when (eq system-type 'darwin)
-    (defun copy-from-osx ()
-      (shell-command-to-string "pbpaste"))
-    (defun paste-to-osx (text &optional push)
-      (let ((process-connection-type nil))
-        (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
-          (process-send-string proc text)
-          (process-send-eof proc))))
-    (setq interprogram-cut-function 'paste-to-osx)
-    (setq interprogram-paste-function 'copy-from-osx))
+  ;; https://github.com/syl20bnr/spacemacs/issues/2222#issuecomment-462100076
+  (xclip-mode 1)
 
   ;; modify evil insert mode
   (bind-keys :map evil-insert-state-map
