@@ -368,11 +368,22 @@ you should place your code here."
     (global-set-key (kbd "s-'") 'switch-window)
     )
 
-  ;; copy & paste with osx clipboard, defualt for gui but not defualt in terminal
+  ;; copy & paste clipboard, defualt for gui but not defualt in terminal
   ;; https://github.com/syl20bnr/spacemacs/issues/2222#issuecomment-462100076
-  (xclip-mode 1)
+  (unless (display-graphic-p)
+    (xclip-mode 1)
+    (defun cth/advice-around-eval-visual-paste (orig-fun &rest args)
+      "Fix problem that: xclip & evil-visual-paste doesn't work together -> paste fail, nothing changes"
+      (let ((res nil)
+            (orig-interprogram-cur-function interprogram-cut-function))
+        (setq interprogram-cut-function nil)
+        (setq res (apply orig-fun args))
+        (setq interprogram-cut-function orig-interprogram-cur-function)
+        res))
+    (advice-add 'evil-visual-paste :around 'cth/advice-around-eval-visual-paste))
 
-  ;; modify evil insert mode
+    ;; evil settings
+  (setq evil-kill-on-visual-paste nil)
   (bind-keys :map evil-insert-state-map
              ("C-a" . move-beginning-of-line)
              ("C-e" . move-end-of-line)
