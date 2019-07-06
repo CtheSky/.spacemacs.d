@@ -382,7 +382,11 @@ you should place your code here."
         res))
     (advice-add 'evil-visual-paste :around 'cth/advice-around-eval-visual-paste))
 
-    ;; evil settings
+  ;; disable the mouse support in X11 terminals in order to enable copying/pasting with the mouse
+  ;; http://spacemacs.org/doc/FAQ#make-copypaste-working-with-the-mouse-in-x11-terminals
+  (xterm-mouse-mode -1)
+
+  ;; evil settings
   (setq evil-kill-on-visual-paste nil)
   (bind-keys :map evil-insert-state-map
              ("C-a" . move-beginning-of-line)
