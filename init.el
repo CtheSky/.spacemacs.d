@@ -395,9 +395,11 @@ you should place your code here."
              ("C-n" . next-line)
              ("C-k" . kill-line))
 
-  ;; org
+  ;; Set custom org agenda path if env var is set
   (with-eval-after-load 'org
-    (push "~/org/agenda" org-agenda-files))
+    (let ((custom-org-agenda-dir (getenv "CTH_EMACS_ORG_AGENDA_DIR")))
+      (when custom-org-agenda-dir
+        (push custom-org-agenda-dir org-agenda-files))))
 
   ;; mod line
   (setq powerline-default-separator 'utf-8)
