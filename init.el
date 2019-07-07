@@ -403,6 +403,7 @@ you should place your code here."
   (with-eval-after-load 'org
     (let ((custom-org-agenda-dir (getenv "CTH_EMACS_ORG_AGENDA_DIR")))
       (when custom-org-agenda-dir
+        (setq org-agenda-skip-scheduled-if-deadline-is-shown `not-today)
         (push custom-org-agenda-dir org-agenda-files))))
 
   ;; mod line
