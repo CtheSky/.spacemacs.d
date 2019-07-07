@@ -384,7 +384,8 @@ you should place your code here."
 
   ;; disable the mouse support in X11 terminals in order to enable copying/pasting with the mouse
   ;; http://spacemacs.org/doc/FAQ#make-copypaste-working-with-the-mouse-in-x11-terminals
-  (xterm-mouse-mode -1)
+  (unless (getenv "CTH_EMACS_ENABLE_XTERM_MOUSE_MODE")
+    (xterm-mouse-mode -1))
 
   ;; evil settings
   (setq evil-kill-on-visual-paste nil)
