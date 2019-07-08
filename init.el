@@ -370,7 +370,7 @@ you should place your code here."
 
   ;; copy & paste clipboard, defualt for gui but not defualt in terminal
   ;; https://github.com/syl20bnr/spacemacs/issues/2222#issuecomment-462100076
-  (unless (display-graphic-p)
+  (when (and (not (display-graphic-p)) (getenv "CTH_EMACS_ENABLE_XCLIP_MODE"))
     (xclip-mode 1)
     (defun cth/advice-around-eval-visual-paste (orig-fun &rest args)
       "Fix problem that: xclip & evil-visual-paste doesn't work together -> paste fail, nothing changes"
