@@ -36,6 +36,7 @@ values."
      lua
      rust
      javascript
+     html
      yaml
      search-engine
      (ibuffer :variables ibuffer-group-buffers-by 'projects)
