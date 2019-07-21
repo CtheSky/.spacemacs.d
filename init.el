@@ -65,11 +65,13 @@ values."
      (shell :variables
              shell-default-height 30
              shell-default-position 'bottom)
-     eterm-256color
      ;; spell-checking
      ;; version-control
-     osx-dictionary
      neotree
+     ;; my layers
+     k8s
+     eterm-256color
+     osx-dictionary
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
