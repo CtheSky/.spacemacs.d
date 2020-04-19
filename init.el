@@ -31,43 +31,50 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     shell-scripts
-     docker
-     nginx
+     ;; major mode
      lua
-     rust
-     javascript
      html
      yaml
-     search-engine
-     (ibuffer :variables ibuffer-group-buffers-by 'projects)
-     (python :variables python-test-runner 'pytest)
-     cmake
-     (c-c++ :variables
-            c-c++-enable-clang-support t
-            c-c++-backend 'rtags)
-     ;; ----------------------------------------------------------------
-     ;; Example of useful layers you may want to use right away.
-     ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
-     ;; <M-m f e R> (Emacs style) to install them.
-     ;; ----------------------------------------------------------------
+     rust
+     nginx
+     scala
+     react
+     docker
+     emacs-lisp
+     (javascript :variables
+                 javascript-backend 'lsp)
+     shell-scripts
+     (python :variables
+             python-backend 'lsp
+             python-test-runner 'pytest
+             python-formatter 'black
+             python-format-on-save nil)
+     (go :variables
+         go-backend 'lsp
+         go-tab-width 4
+         go-format-before-save t
+         go-use-golangci-lint t)
+     (org :variables org-want-todo-bindings t)
+     (c-c++ :variables c-c++-backend 'lsp-clangd)
+
+     ;; tool
+     org
+     dap
+     git
      helm
+     cmake
+     neotree
+     search-engine
+     (dash :variables helm-dash-browser-func 'eww)
+     (ibuffer :variables ibuffer-group-buffers-by 'projects)
+     (shell :variables
+             shell-default-shell 'vterm
+             shell-default-height 30
+             shell-default-position 'bottom)
      (syntax-checking :variables syntax-checking-enable-tooltips nil)
      (auto-completion :variables
                       auto-completion-enable-help-tooltip t)
-     ;; better-defaults
-     emacs-lisp
-     git
-     dash
-     (dash :variables helm-dash-browser-func 'eww)
-     ;; markdown
-     (org :variables org-want-todo-bindings t)
-     (shell :variables
-             shell-default-height 30
-             shell-default-position 'bottom)
-     ;; spell-checking
-     ;; version-control
-     neotree
+
      ;; my layers
      k8s
      eterm-256color
@@ -80,7 +87,7 @@ values."
    dotspacemacs-additional-packages
    '(
      xclip
-     ;; (vterm :location "~/.emacs.d/private/local/emacs-libvterm/")
+     zoom-window
      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -309,7 +316,7 @@ values."
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
    ;; (default '("ag" "pt" "ack" "grep"))
-   dotspacemacs-search-tools '("ag" "pt" "ack" "grep")
+   dotspacemacs-search-tools '("rg" "ag" "pt" "ack" "grep")
    ;; The default package repository used if no explicit repository has been
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
@@ -329,6 +336,10 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+    ;; (setq configuration-layer-elpa-archives
+    ;;   '(("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+    ;;     ("org-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
+    ;;     ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")))
   )
 
 (defun dotspacemacs/user-config ()
@@ -338,6 +349,13 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+
+  (use-package zoom-window
+    :config (zoom-window-setup)
+    :bind ("C-@" . 'zoom-window-zoom)
+    :custom
+    (zoom-window-use-persp t)
+    (zoom-window-mode-line-color "color-186"))
 
   ;; fix low color contrast in terminal daemon
   ;; https://github.com/syl20bnr/spacemacs/issues/10916
@@ -504,22 +522,22 @@ you should place your code here."
   (spacemacs/set-leader-keys "it" 'cth/send-current-line-to-term)
   (define-key evil-visual-state-map (kbd "t") 'cth/send-active-region-to-term)
 
- ;; vterm
+  ;; vterm
   ;; (require 'vterm)
-  ;; (evil-define-key 'insert vterm-mode-map
-  ;;   (kbd "C-a") '(lambda () (interactive) (vterm-send-string "\C-a"))
-  ;;   (kbd "C-e") '(lambda () (interactive) (vterm-send-string "\C-e"))
-  ;;   (kbd "C-f") '(lambda () (interactive) (vterm-send-string "\C-f"))
-  ;;   (kbd "C-b") '(lambda () (interactive) (vterm-send-string "\C-b"))
-  ;;   (kbd "C-d") '(lambda () (interactive) (vterm-send-string "\C-d"))
-  ;;   (kbd "C-w") '(lambda () (interactive) (vterm-send-string "\C-w"))
-  ;;   (kbd "C-r") '(lambda () (interactive) (vterm-send-string "\C-r"))
-  ;;   (kbd "C-n") '(lambda () (interactive) (vterm-send-string "\C-n"))
-  ;;   (kbd "C-p") '(lambda () (interactive) (vterm-send-string "\C-p"))
-  ;;   (kbd "C-k") '(lambda () (interactive) (vterm-send-string "\C-k"))
-  ;;   (kbd "C-v") '(lambda () (interactive) (vterm-yank))
-  ;;   (kbd "s-v") '(lambda () (interactive) (vterm-yank))
-  ;;   (kbd "C-]") '(lambda () (interactive) (vterm-send-string "\C-[")))
+  (evil-define-key 'insert vterm-mode-map
+    (kbd "C-a") '(lambda () (interactive) (vterm-send-string "\C-a"))
+    (kbd "C-e") '(lambda () (interactive) (vterm-send-string "\C-e"))
+    (kbd "C-f") '(lambda () (interactive) (vterm-send-string "\C-f"))
+    (kbd "C-b") '(lambda () (interactive) (vterm-send-string "\C-b"))
+    (kbd "C-d") '(lambda () (interactive) (vterm-send-string "\C-d"))
+    (kbd "C-w") '(lambda () (interactive) (vterm-send-string "\C-w"))
+    (kbd "C-r") '(lambda () (interactive) (vterm-send-string "\C-r"))
+    (kbd "C-n") '(lambda () (interactive) (vterm-send-string "\C-n"))
+    (kbd "C-p") '(lambda () (interactive) (vterm-send-string "\C-p"))
+    (kbd "C-k") '(lambda () (interactive) (vterm-send-string "\C-k"))
+    (kbd "C-v") '(lambda () (interactive) (vterm-yank))
+    (kbd "s-v") '(lambda () (interactive) (vterm-yank))
+    (kbd "C-]") '(lambda () (interactive) (vterm-send-string "\C-[")))
 
   ;; python
   (pyvenv-tracking-mode)
@@ -580,8 +598,9 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (phpunit phpcbf php-extras php-auto-yasnippets helm-gtags ggtags drupal-mode counsel-gtags company-php ac-php-core php-mode disaster company-c-headers cmake-mode clang-format vterm lua-mode eterm-256color nginx-mode org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot ibuffer-projectile osx-dictionary engine-mode toml-mode racer flycheck-rust cargo markdown-mode rust-mode helm-dash dash-at-point git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl company-quickhelp flycheck-pos-tip pos-tip flycheck web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode yaml-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help ac-ispell helm-company helm-c-yasnippet fuzzy company-statistics company-anaconda company auto-yasnippet yasnippet auto-complete evil-magit smeargle orgit magit-gitflow magit-popup magit transient helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-commit with-editor lv yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
- '(safe-local-variable-values (quote ((pyvenv-workon . "ats3")))))
+    (emamux zoom-window flycheck-package phpunit phpcbf php-extras php-auto-yasnippets helm-gtags ggtags drupal-mode counsel-gtags company-php ac-php-core php-mode disaster company-c-headers cmake-mode clang-format vterm lua-mode eterm-256color nginx-mode org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot ibuffer-projectile osx-dictionary engine-mode toml-mode racer flycheck-rust cargo markdown-mode rust-mode helm-dash dash-at-point git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl company-quickhelp flycheck-pos-tip pos-tip flycheck web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc company-tern tern coffee-mode yaml-mode xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help ac-ispell helm-company helm-c-yasnippet fuzzy company-statistics company-anaconda company auto-yasnippet yasnippet auto-complete evil-magit smeargle orgit magit-gitflow magit-popup magit transient helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-commit with-editor lv yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+ '(safe-local-variable-values (quote ((encoding . utf-8) (pyvenv-workon . "ats3"))))
+ '(zoom-window-use-persp t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
