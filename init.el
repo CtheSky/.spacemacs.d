@@ -37,7 +37,6 @@ values."
      yaml
      rust
      nginx
-     scala
      react
      docker
      emacs-lisp
