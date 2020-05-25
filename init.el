@@ -429,6 +429,11 @@ you should place your code here."
         (setq org-todo-keywords '((sequence "TODO(t)" "|" "DONE(d)" "CANCELED(c)")))
         (push custom-org-agenda-dir org-agenda-files))))
 
+  ;; neotree ignore hidden files
+  (with-eval-after-load 'neotree
+    (setq-default neo-show-hidden-files nil)
+    (add-to-list 'neo-hidden-regexp-list "__pycache__"))
+
   ;; mod line
   (setq powerline-default-separator 'utf-8)
   (which-function-mode t)
