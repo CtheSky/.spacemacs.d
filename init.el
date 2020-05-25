@@ -44,7 +44,7 @@ values."
                  javascript-backend 'lsp)
      shell-scripts
      (python :variables
-             python-backend 'lsp
+             python-backend 'anaconda
              python-test-runner 'pytest
              python-formatter 'black
              python-format-on-save nil)
