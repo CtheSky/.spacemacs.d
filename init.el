@@ -369,6 +369,11 @@ you should place your code here."
   (set-face-attribute 'spacemacs-iedit-face nil :foreground "#262626")
   (set-face-attribute 'spacemacs-iedit-insert-face nil :foreground "#262626")
 
+  ;; Enable mouse support
+  (unless window-system
+    (global-set-key (kbd "<mouse-4>") 'scroll-down-line)
+    (global-set-key (kbd "<mouse-5>") 'scroll-up-line))
+
   ;; Bind "Emacs Mac port" keys the same as Emacs NS/Cocoa
   (cua-mode t)
   (when (symbolp 'mac-control-modifier)
