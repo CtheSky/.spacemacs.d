@@ -424,7 +424,10 @@ you should place your code here."
              ("C-w" . backward-kill-word)
              ("C-p" . previous-line)
              ("C-n" . next-line)
-             ("C-k" . kill-line))
+             ("C-k" . kill-line)
+             :map evil-normal-state-map
+             ("RET" . spacemacs/evil-insert-line-below)
+             )
 
   ;; Set custom org agenda path if env var is set
   (with-eval-after-load 'org
