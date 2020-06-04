@@ -414,6 +414,7 @@ you should place your code here."
     (xterm-mouse-mode -1))
 
   ;; evil settings
+  (setq evil-want-fine-undo t)
   (setq evil-kill-on-visual-paste nil)
   (bind-keys :map evil-insert-state-map
              ("C-a" . move-beginning-of-line)
