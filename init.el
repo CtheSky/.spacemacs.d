@@ -536,9 +536,9 @@ you should place your code here."
   (define-key evil-visual-state-map (kbd "t") 'cth/send-active-region-to-term)
 
   ;; vterm
-  ;; (require 'vterm)
   (evil-define-key 'insert vterm-mode-map
     (kbd "C-a") '(lambda () (interactive) (vterm-send-string "\C-a"))
+    (kbd "C-c") '(lambda () (interactive) (vterm-send-string "\C-c"))
     (kbd "C-e") '(lambda () (interactive) (vterm-send-string "\C-e"))
     (kbd "C-f") '(lambda () (interactive) (vterm-send-string "\C-f"))
     (kbd "C-b") '(lambda () (interactive) (vterm-send-string "\C-b"))
