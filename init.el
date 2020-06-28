@@ -39,6 +39,7 @@ values."
      nginx
      react
      docker
+     protobuf
      emacs-lisp
      (javascript :variables
                  javascript-backend 'lsp)
