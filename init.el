@@ -88,6 +88,7 @@ values."
    '(
      xclip
      zoom-window
+     centaur-tabs
      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -349,6 +350,35 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+  (use-package centaur-tabs
+    :demand
+    :config
+    (centaur-tabs-mode t)
+    (setq centaur-tabs-buffer-groups-function 'vmacs-awesome-tab-buffer-groups)
+    (defun vmacs-awesome-tab-buffer-groups ()
+      "`vmacs-awesome-tab-buffer-groups' control buffers' group rules. "
+      (list
+       (cond
+        ((derived-mode-p 'eshell-mode 'term-mode 'shell-mode 'vterm-mode)
+         "Term")
+        ((string-match-p (rx (or
+                              "\*Helm"
+                              "\*helm"
+                              "\*tramp"
+                              "\*Completions\*"
+                              "\*sdcv\*"
+                              "\*Messages\*"
+                              "\*Ido Completions\*"
+                              ))
+                         (buffer-name))
+         "Emacs")
+        (t "Common"))))
+    (defun centaur-tabs-hide-tab (x)
+      "Do no to show buffer X in tabs."
+        (not (string-prefix-p "vterm" (format "%s" x))))
+    :bind
+    ("C-h" . centaur-tabs-backward)
+    ("C-l" . centaur-tabs-forward))
 
   (use-package zoom-window
     :config (zoom-window-setup)
@@ -551,7 +581,12 @@ you should place your code here."
     (kbd "C-k") '(lambda () (interactive) (vterm-send-string "\C-k"))
     (kbd "C-v") '(lambda () (interactive) (vterm-yank))
     (kbd "s-v") '(lambda () (interactive) (vterm-yank))
-    (kbd "C-]") '(lambda () (interactive) (vterm-send-string "\C-[")))
+    (kbd "C-]") '(lambda () (interactive) (vterm-send-string "\C-["))
+    (kbd "C-l") '(lambda () (interactive) (centaur-tabs-forward))
+    (kbd "C-h") '(lambda () (interactive) (centaur-tabs-backward)))
+  (evil-define-key 'normal vterm-mode-map
+    (kbd "C-l") '(lambda () (interactive) (centaur-tabs-forward))
+    (kbd "C-h") '(lambda () (interactive) (centaur-tabs-backward)))
 
   ;; python
   (pyvenv-tracking-mode)
