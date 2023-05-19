@@ -56,6 +56,9 @@ values."
          go-use-golangci-lint t)
      (org :variables org-want-todo-bindings t)
      (c-c++ :variables c-c++-backend 'lsp-clangd)
+     (lsp :variables
+          lsp-rust-server 'rust-analyzer
+          lsp-rust-analyzer-server-display-inlay-hints t)
 
      ;; tool
      org
@@ -166,7 +169,7 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Menlo"
+   dotspacemacs-default-font '("Monaco For Powerline"
                                :size 12
                                :height 14
                                :weight normal
